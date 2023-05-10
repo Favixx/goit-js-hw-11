@@ -9,6 +9,13 @@ let queryData;
 
 const gallery = document.querySelector('.gallery')
 export const form = document.querySelector("#search-form");
+gallery.addEventListener('click', handleClick)
+function handleClick(e) {
+    e.preventDefault();
+    if (!e.target.classList.contains('gallery-item_img')) {
+        return;
+    }
+}
 let page = 1;
 function renderImages(images) {
     if (!gallery) {
@@ -72,7 +79,5 @@ async function submitHandler(event) {
         notiflix.Notify.failure('Failed to load images. Please try again later.');
     }
 }
-const lightbox = new SimpleLightbox('.gallery a', {
-    captionDelay: 250,
-});
+const lightbox = new SimpleLightbox('.gallery__link');
 form.addEventListener("submit", submitHandler);
