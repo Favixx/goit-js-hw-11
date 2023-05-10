@@ -31,8 +31,7 @@ async function sendQuery(e) {
             Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)
         }
 
-    } catch {
-
+        page = 1
     }
 }
 
