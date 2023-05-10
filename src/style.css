@@ -60,3 +60,9 @@ a {
 
     text-align: center;
 }
+.end-collection-text{
+    display: none;
+}
+.end-collection-text.visible{
+    display: block;
+}

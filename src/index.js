@@ -1,29 +1,45 @@
 import SimpleLightbox from "simplelightbox";
-import axios from "axios";
 import notiflix from "notiflix";
 import "./style.css";
-import { callForImgs } from "./callForImgs";
 import 'simplelightbox/dist/simple-lightbox.min.css';
-let queryData;
-// let observer = new IntersectionObserver(callback)
-
+import { callForImgs } from "./callForImgs";
+import Notiflix from "notiflix";
+let page = 1;
 const gallery = document.querySelector('.gallery')
+const loader = document.querySelector(".end-collection-text");
 export const form = document.querySelector("#search-form");
-gallery.addEventListener('click', handleClick)
-function handleClick(e) {
-    e.preventDefault();
-    if (!e.target.classList.contains('gallery-item_img')) {
-        return;
+const lightbox = new SimpleLightbox(".gallery a");
+
+async function sendQuery(e) {
+    try {
+        if (!form.elements.searchQuery.value.trim()) {
+            return;
+        }
+
+        e.preventDefault();
+        gallery.innerHTML = ""
+
+        const response = await callForImgs(page)
+        await renderImages(response.data.hits)
+        if (response.data.totalHits === 0) {
+            Notiflix.Notify.failure("Sorry, we didn't find any images for your request")
+        }
+        if (response.data.totalHits === 1) {
+            Notiflix.Notify.success(`Hooray! We found 1 image.`)
+        }
+        if (response.data.totalHits > 1) {
+            Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)
+        }
+
+    } catch {
+
     }
 }
-let page = 1;
-function renderImages(images) {
-    if (!gallery) {
-        console.error('The gallery element was not found in the document.');
-        return;
-    }
 
-    const markup = queryData
+
+
+function renderImages(images) {
+    const markup = images
         .map(image => {
             const {
                 id,
@@ -37,47 +53,47 @@ function renderImages(images) {
             } = image;
 
             return `
-        <a class="gallery__link" href="${largeImageURL}">
-        <div class="gallery__item" id="${id}">
-        <img class="gallery-item_img" src="${webformatURL}" alt="${tags}" loading="lazy" />
-        <div class="info">
-        <p class="info-item"><b>Likes</b>${likes}</p>
-              <p class="info-item"><b>Views</b>${views}</p>
-              <p class="info-item"><b>Comments</b>${comments}</p>
-              <p class="info-item"><b>Downloads</b>${downloads}</p>
-              </div>
-              </div>
-              </a>
-              `;
+            <a class="gallery__link" href="${largeImageURL}">
+            <div class="gallery__item" id="${id}">
+            <img class="gallery-item_img" src="${webformatURL}" alt="${tags}" loading="lazy" />
+            <div class="info">
+            <p class="info-item"><b>Likes</b>${likes}</p>
+                        <p class="info-item"><b>Views</b>${views}</p>
+                        <p class="info-item"><b>Comments</b>${comments}</p>
+                        <p class="info-item"><b>Downloads</b>${downloads}</p>
+                        </div>
+                        </div>
+                        </a>
+                        `;
         })
         .join('');
 
     gallery.insertAdjacentHTML('beforeend', markup);
+    lightbox.refresh()
+    loader.classList.add("visible")
+}
 
-    const { height: cardHeight } = document
-        .querySelector('.gallery')
-        .firstElementChild.getBoundingClientRect();
+form.addEventListener("submit", sendQuery)
 
-    window.scrollBy({
-        top: cardHeight * 2,
-        behavior: 'smooth',
+
+
+async function loadMorePhotos(entries, observer) {
+    entries.forEach(async (entry) => {
+        if (entry.isIntersecting) {
+            page++;
+            const response = await callForImgs(page);
+            const images = response.data.hits;
+            loader.classList.remove("visible")
+            if (images.length === 0) {
+                observer.unobserve(loader);
+                Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`)
+                return;
+            }
+
+            renderImages(images);
+        }
     });
 }
 
-async function submitHandler(event) {
-    event.preventDefault()
-    page = 1;
-    gallery.innerHTML = '';
-
-    try {
-        const response = await callForImgs();
-        queryData = response.data.hits;
-        console.log(queryData)
-        renderImages(queryData);
-    } catch (error) {
-        console.error(error);
-        notiflix.Notify.failure('Failed to load images. Please try again later.');
-    }
-}
-const lightbox = new SimpleLightbox('.gallery__link');
-form.addEventListener("submit", submitHandler);
+const observer = new IntersectionObserver(loadMorePhotos);
+observer.observe(loader);
