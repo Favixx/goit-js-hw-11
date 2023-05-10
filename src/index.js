@@ -1,4 +1,4 @@
-import simpleLightbox from "simplelightbox";
+import SimpleLightbox from "simplelightbox";
 import axios from "axios";
 import notiflix from "notiflix";
 import "./style.css";
@@ -72,8 +72,7 @@ async function submitHandler(event) {
         notiflix.Notify.failure('Failed to load images. Please try again later.');
     }
 }
-
-form.addEventListener("submit", submitHandler);
 const lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
 });
+form.addEventListener("submit", submitHandler);
