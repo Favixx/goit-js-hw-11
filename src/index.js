@@ -4,6 +4,7 @@ import notiflix from "notiflix";
 import "./style.css";
 import { callForImgs } from "./callForImgs";
 import 'simplelightbox/dist/simple-lightbox.min.css';
+let queryData;
 // let observer = new IntersectionObserver(callback)
 
 const gallery = document.querySelector('.gallery')
