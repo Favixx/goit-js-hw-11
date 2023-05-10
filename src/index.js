@@ -11,28 +11,26 @@ export const form = document.querySelector("#search-form");
 const lightbox = new SimpleLightbox(".gallery a");
 
 async function sendQuery(e) {
-    try {
-        if (!form.elements.searchQuery.value.trim()) {
-            return;
-        }
-
-        e.preventDefault();
-        gallery.innerHTML = ""
-
-        const response = await callForImgs(page)
-        await renderImages(response.data.hits)
-        if (response.data.totalHits === 0) {
-            Notiflix.Notify.failure("Sorry, we didn't find any images for your request")
-        }
-        if (response.data.totalHits === 1) {
-            Notiflix.Notify.success(`Hooray! We found 1 image.`)
-        }
-        if (response.data.totalHits > 1) {
-            Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)
-        }
-
-        page = 1
+    if (!form.elements.searchQuery.value.trim()) {
+        return;
     }
+
+    e.preventDefault();
+    gallery.innerHTML = ""
+
+    const response = await callForImgs(page)
+    await renderImages(response.data.hits)
+    if (response.data.totalHits === 0) {
+        Notiflix.Notify.failure("Sorry, we didn't find any images for your request")
+    }
+    if (response.data.totalHits === 1) {
+        Notiflix.Notify.success(`Hooray! We found 1 image.`)
+    }
+    if (response.data.totalHits > 1) {
+        Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)
+    }
+
+    page = 1
 }
 
 
