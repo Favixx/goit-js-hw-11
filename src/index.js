@@ -8,7 +8,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const gallery = document.querySelector('.gallery')
 export const form = document.querySelector("#search-form");
-let page;
+let page = 1;
 function renderImages(images) {
     if (!gallery) {
         console.error('The gallery element was not found in the document.');
