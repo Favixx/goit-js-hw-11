@@ -29,8 +29,10 @@ async function sendQuery(e) {
     if (response.data.totalHits > 1) {
         Notiflix.Notify.success(`Hooray! We found ${response.data.totalHits} images.`)
     }
-
-    page = 1
+    if (response.data.totalHits < 40 && response.data.totalHits !== 0) {
+        Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`)
+    }
+    return page = 1
 }
 
 
@@ -81,9 +83,10 @@ async function loadMorePhotos(entries, observer) {
             const response = await callForImgs(page);
             const images = response.data.hits;
             loader.classList.remove("visible")
-            if (images.length === 0) {
+            if (images.length === 0 && response.data.totalHits !== 0) {
                 observer.unobserve(loader);
                 Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`)
+                page = 1;
                 return;
             }
 
