@@ -22,6 +22,7 @@ async function sendQuery(e) {
     await renderImages(response.data.hits)
     if (response.data.totalHits === 0) {
         Notiflix.Notify.failure("Sorry, we didn't find any images for your request")
+        observer.unobserve(loader)
     }
     if (response.data.totalHits === 1) {
         Notiflix.Notify.success(`Hooray! We found 1 image.`)
@@ -89,7 +90,9 @@ async function loadMorePhotos(entries, observer) {
                 page = 1;
                 return;
             }
-
+            if (page === 1 && gallery.innerHTML === "") {
+                return;
+            }
             renderImages(images);
         }
     });
